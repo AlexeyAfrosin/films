@@ -1,3 +1,16 @@
 <resources>
-    <string name="app_name">films</string>
+    <string name="app_name">Films</string>
+    <string name="film_poster">Постер фильма</string>
+    <string name="change_film_country">Изменить страну, выпустившую фильм</string>
+    <string name="error_text">Ошибка</string>
+    <string name="reload_text">Перезегрузка</string>
+    <string name="system_message">СООБЩЕНИЕ ОТ СИСТЕМЫ\n</string>
+    <string name="system_action">Событие: %s</string>
+    <string name="connection_on">соединение подключено</string>
+    <string name="connection_off">соединение отключено</string>
+    <string name="error_get_films">Ошибка при получении данных. Попробуйте позже</string>
+
+    <string name="show_popular_person">Список популярных актеров</string>
+    <string name="person_profile">Профайл актера</string>
+
 </resources>

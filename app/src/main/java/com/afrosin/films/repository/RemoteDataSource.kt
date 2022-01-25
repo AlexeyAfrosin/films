@@ -1,0 +1,71 @@
+package com.afrosin.films.repository
+
+import com.afrosin.films.model.FilmsDiscoverDTO
+import com.afrosin.films.model.FilmsPersonPopularDTO
+import com.afrosin.films.model.PersonDetailsDTO
+import com.google.gson.GsonBuilder
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Response
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Callback
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
+const val BASE_URL = "https://api.tmdb.org/"
+const val POSTER_URL = "https://image.tmdb.org/t/p/w300"
+
+class RemoteDataSource {
+
+    private val filmsApi = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
+        .client(createOkHttpClient(FilmsApiInterceptor()))
+        .build()
+        .create(FilmsAPI::class.java)
+
+    fun getFilmsFromServer(
+        apiKey: String,
+        language: String,
+        callBack: Callback<FilmsDiscoverDTO>,
+        includeAdult: Boolean
+    ) {
+        filmsApi.getDiscoverMovie(apiKey, language, includeAdult)
+            .enqueue(callBack)
+    }
+
+    fun getPopularPersonsFromServer(
+        apiKey: String,
+        language: String,
+        callBack: Callback<FilmsPersonPopularDTO>
+    ) {
+        filmsApi.getPersonPopular(apiKey, language)
+            .enqueue(callBack)
+    }
+
+    fun getPersonDetailsFromServer(
+        person_id: Long,
+        apiKey: String,
+        language: String,
+        callBack: Callback<PersonDetailsDTO>
+    ) {
+        filmsApi.getPersonDetails(person_id, apiKey, language)
+            .enqueue(callBack)
+    }
+
+
+    private fun createOkHttpClient(interceptor: Interceptor): OkHttpClient {
+        val httpClient = OkHttpClient.Builder()
+        httpClient.addInterceptor(interceptor)
+
+        httpClient.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+        return httpClient.build()
+    }
+
+    class FilmsApiInterceptor : Interceptor {
+        override fun intercept(chain: Interceptor.Chain): Response {
+            return chain.proceed(chain.request())
+        }
+
+    }
+}
