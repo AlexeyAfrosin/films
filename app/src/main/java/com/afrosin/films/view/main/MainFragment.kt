@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.afrosin.films.BuildConfig
 import com.afrosin.films.R
 import com.afrosin.films.databinding.FragmentMainBinding
@@ -26,6 +28,9 @@ class MainFragment : Fragment() {
 
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
+    private var isLoading: Boolean = false
+    private var films = mutableListOf<Film>()
+    private var page = 0
 
     private val viewModel: MainViewModel by lazy {
         ViewModelProvider(this).get(MainViewModel::class.java)
@@ -62,8 +67,32 @@ class MainFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.mainFragmentRecyclerView.adapter = adapter
-        binding.mainFragmentFAB.setOnClickListener { changeFilmDataSet() }
+
+        with(binding) {
+
+            mainFragmentRecyclerView.setHasFixedSize(true)
+            val layoutManager = GridLayoutManager(context, 2)
+            mainFragmentRecyclerView.layoutManager = layoutManager
+            mainFragmentRecyclerView.adapter = adapter
+            mainFragmentFAB.setOnClickListener { changeFilmDataSet() }
+            mainFragmentRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (!isLoading) {
+                        if (layoutManager.findLastCompletelyVisibleItemPosition() == films.size - 1) {
+                            getIsDataSetParam()
+                            getFilmDataSet()
+                            isLoading = true
+                        }
+                    }
+                }
+            })
+            adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    layoutManager.scrollToPositionWithOffset(positionStart, 0)
+                }
+            })
+        }
         viewModel.getLiveData().observe(viewLifecycleOwner, { renderData(it) })
 
         getIsDataSetParam()
@@ -80,15 +109,17 @@ class MainFragment : Fragment() {
     private fun renderData(appState: AppState) {
         when (appState) {
             is AppState.Success -> {
-                val filmsData = appState.filmsData
+                films.addAll(appState.filmsData)
                 binding.includedLoadingLayout.loadingLayout.hide()
-                adapter.setData(filmsData)
+                isLoading = false
+                adapter.setData(films)
             }
             is AppState.Loading -> {
                 binding.includedLoadingLayout.loadingLayout.show()
             }
             is AppState.Error -> {
                 binding.includedLoadingLayout.loadingLayout.hide()
+                isLoading = false
                 binding.mainFragmentRootView.showSnackBar(getString(R.string.error_text),
                     getString(R.string.reload_text), { getFilmDataSet() })
             }
@@ -101,9 +132,9 @@ class MainFragment : Fragment() {
             true -> "ru-RU"
             else -> "en-EN"
         }
-        val includeAdult: Boolean = true
-
-        viewModel.getDataFromFromServer(BuildConfig.FILM_API_KEY, lang, includeAdult)
+        val includeAdult = true
+        page += 1
+        viewModel.getDataFromFromServer(BuildConfig.FILM_API_KEY, lang, includeAdult, page)
     }
 
     private fun changeLang() {

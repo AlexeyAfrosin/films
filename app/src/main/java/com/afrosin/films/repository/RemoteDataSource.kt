@@ -1,8 +1,6 @@
 package com.afrosin.films.repository
 
 import com.afrosin.films.model.FilmsDiscoverDTO
-import com.afrosin.films.model.FilmsPersonPopularDTO
-import com.afrosin.films.model.PersonDetailsDTO
 import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -28,31 +26,12 @@ class RemoteDataSource {
         apiKey: String,
         language: String,
         callBack: Callback<FilmsDiscoverDTO>,
-        includeAdult: Boolean
+        includeAdult: Boolean,
+        page: Int
     ) {
-        filmsApi.getDiscoverMovie(apiKey, language, includeAdult)
+        filmsApi.getDiscoverMovie(apiKey, language, includeAdult, page)
             .enqueue(callBack)
     }
-
-    fun getPopularPersonsFromServer(
-        apiKey: String,
-        language: String,
-        callBack: Callback<FilmsPersonPopularDTO>
-    ) {
-        filmsApi.getPersonPopular(apiKey, language)
-            .enqueue(callBack)
-    }
-
-    fun getPersonDetailsFromServer(
-        person_id: Long,
-        apiKey: String,
-        language: String,
-        callBack: Callback<PersonDetailsDTO>
-    ) {
-        filmsApi.getPersonDetails(person_id, apiKey, language)
-            .enqueue(callBack)
-    }
-
 
     private fun createOkHttpClient(interceptor: Interceptor): OkHttpClient {
         val httpClient = OkHttpClient.Builder()

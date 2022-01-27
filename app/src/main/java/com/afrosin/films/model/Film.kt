@@ -2,6 +2,7 @@ package com.afrosin.films.model
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
+import java.util.*
 
 @Parcelize
 data class Film(
@@ -9,5 +10,6 @@ data class Film(
     val posterPath: String? = "",
     val overview: String? = "Описание фильма",
     val id: Long,
-    val note: String? = null
+    val releaseDate: Date,
+    val voteAverage: Float
 ) : Parcelable

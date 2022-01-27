@@ -1,8 +1,6 @@
 package com.afrosin.films.repository
 
 import com.afrosin.films.model.FilmsDiscoverDTO
-import com.afrosin.films.model.FilmsPersonPopularDTO
-import com.afrosin.films.model.PersonDetailsDTO
 import retrofit2.Callback
 
 
@@ -13,26 +11,9 @@ class RepositoryImpl(private val remoteDataSource: RemoteDataSource = RemoteData
         apiKey: String,
         language: String,
         callBack: Callback<FilmsDiscoverDTO>,
-        includeAdult: Boolean
+        includeAdult: Boolean,
+        page: Int
     ) {
-        remoteDataSource.getFilmsFromServer(apiKey, language, callBack, includeAdult)
+        remoteDataSource.getFilmsFromServer(apiKey, language, callBack, includeAdult, page)
     }
-
-    override fun getPopularPersonFromServer(
-        apiKey: String,
-        language: String,
-        callBack: Callback<FilmsPersonPopularDTO>
-    ) {
-        remoteDataSource.getPopularPersonsFromServer(apiKey, language, callBack)
-    }
-
-    override fun getPersonDetailsFromServer(
-        person_id: Long,
-        apiKey: String,
-        language: String,
-        callBack: Callback<PersonDetailsDTO>
-    ) {
-        remoteDataSource.getPersonDetailsFromServer(person_id, apiKey, language, callBack)
-    }
-
 }

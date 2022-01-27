@@ -20,9 +20,9 @@ class MainViewModel(
 
     fun getLiveData() = liveDataToObserve
 
-    fun getDataFromFromServer(apiKey: String, language: String, includeAdult: Boolean) {
+    fun getDataFromFromServer(apiKey: String, language: String, includeAdult: Boolean, page: Int) {
         liveDataToObserve.value = AppState.Loading
-        repositoryImpl.getFilmsFromServer(apiKey, language, callBack, includeAdult)
+        repositoryImpl.getFilmsFromServer(apiKey, language, callBack, includeAdult, page)
     }
 
     private val callBack = object : Callback<FilmsDiscoverDTO> {

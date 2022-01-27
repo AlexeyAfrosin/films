@@ -5,12 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.afrosin.films.databinding.FragmentDetailsBinding
 import com.afrosin.films.model.Film
-import com.afrosin.films.repository.POSTER_URL
-import com.afrosin.films.viewmodel.DetailsViewModel
-import com.bumptech.glide.Glide
+import com.afrosin.films.utils.loadImage
+import com.afrosin.films.utils.preparePosterUrl
 
 class DetailsFragment : Fragment() {
 
@@ -24,10 +22,6 @@ class DetailsFragment : Fragment() {
             fragment.arguments = bundle
             return fragment
         }
-    }
-
-    private val viewModel: DetailsViewModel by lazy {
-        ViewModelProvider(this).get(DetailsViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -48,16 +42,11 @@ class DetailsFragment : Fragment() {
             binding.filmItems.filmName.text = title
             binding.filmItems.filmDescription.text = overview
 
-            if (posterPath != "") {
-                Glide.with(requireContext()).load(preparePosterUrl(posterPath))
-                    .into(binding.filmItems.filmPoster)
-            }
+            loadImage(preparePosterUrl(posterPath), binding.filmItems.filmPoster)
+
         }
     }
 
-    private fun preparePosterUrl(imageUrl: String?): String {
-        return "${POSTER_URL}${imageUrl}"
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
